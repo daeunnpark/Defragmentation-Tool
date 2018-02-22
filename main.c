@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
      * You code goes below. Do not modify provided parts
      * of the code.
      */
-
+printf("TEST");
 
     /*
      * Do not modify code below.
