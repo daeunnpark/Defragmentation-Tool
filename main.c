@@ -28,41 +28,37 @@ int size; // 61 bits
 
 */
 
-
+int MAXSIZE = 1024;// bytes
+int currentSIZE = 0;
 
 int size1 = GET_SIZE(ram);
 int ID = GET_ID(ram);
 int allogc = GET_ALLOC(ram);
 
 
-printf("-----FROM HERE----\n");
-printf("DATA: %d %d %d \n", size1, ID, allogc);
 
+
+while(currentSIZE <MAXSIZE){
+
+while( GET_SIZE(ram)==0){
+
+ram = ram + 4; //4 bytes
+currentSIZE+=4;
+printf("HH\n");
+
+}
+//ram = NEXT_BLKP(ram);
+//ram =ram+4;
+
+
+printf("-----FROM HERE----\n");
+printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+currentSIZE +=GET_SIZE(ram);
+printf("%d\n", currentSIZE);
 ram = NEXT_BLKP(ram);
 
-size1 = GET_SIZE(ram);
-ID = GET_ID(ram);
-allogc = GET_ALLOC(ram);
-
-
-printf("-----FROM HERE222----\n");
-printf("DATA: %d %d %d \n", size1, ID, allogc);
-
-
-//ram = PREV_BLKP(ram);
-
-size1 = GET_SIZE(ram);
-ID = GET_ID(ram);
-allogc = GET_ALLOC(ram);
-
-
-printf("-----FROM HERE33----\n");
-printf("DATA: %d %d %d \n", size1, ID, allogc);
-
-
-
-
-
+}
+printf("--END printing-- \n");
 
     /*
      * Do not modify code below.
