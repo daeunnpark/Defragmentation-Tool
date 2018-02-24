@@ -6,6 +6,23 @@
 #define GET(p)	(*(unsigned int *)(p))
 #define PUT(p, val)	(*(unsigned int *)(p)= (val))
 
+
+
+/*
+#define PUTSIZE(p, size)	{
+
+
+
+(*(unsigned int *)(HDRP(p))= size))
+
+
+
+
+}
+#define PUTID(p,ID)	(*(unsigned int *)(p)= (ID<<1))
+#define PUTALLOC(p, flag)	(*(unsigned int *)(p)= flag)   
+
+
 #define GET_SIZE(p)	((GET(p) >>3)<<3)
 #define GET_ID(p)	((GET(p) & 0x6 ) >>1)
 
@@ -14,7 +31,7 @@
 #define FTRP(bp)	 ((char*)(bp)+ GET_SIZE(HDRP(bp))-(2*DSIZE))  
 
 #define NEXT_BLKP(bp)	((char*)(bp) +GET_SIZE(bp))
-/*
+
 #define NEXT_BLKP(bp)	((char*)(bp) + GET_SIZE(((char*)(bp)-DSIZE)))
 
 #define PREV_BLKP(bp)	((char*)(bp) + GET_SIZE(((char*)(bp)-2*DSIZE)))

@@ -40,22 +40,25 @@ int allogc = GET_ALLOC(ram);
 
 while(currentSIZE <MAXSIZE){
 
-while( GET_SIZE(ram)==0){
-
-ram = ram + 4; //4 bytes
-currentSIZE+=4;
-printf("HH\n");
-
-}
-//ram = NEXT_BLKP(ram);
-//ram =ram+4;
-
-
+if(GET_SIZE(ram)!=0){
 printf("-----FROM HERE----\n");
 printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 currentSIZE +=GET_SIZE(ram);
 printf("%d\n", currentSIZE);
 ram = NEXT_BLKP(ram);
+
+}
+else{
+while( GET_SIZE(ram)==0){
+ram = ram + 4; //4 bytes
+currentSIZE+=4;
+//printf("HHH\n");
+//printf("currentSIZE: %d \n",currentSIZE);
+}
+//ram = NEXT_BLKP(ram);
+//ram =ram+4;
+}
+
 
 }
 printf("--END printing-- \n");
