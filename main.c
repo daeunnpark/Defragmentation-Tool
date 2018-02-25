@@ -39,13 +39,30 @@ int main(int argc, char** argv) {
 
 	printf("-----FROM HERE----\n");
 
-	while(ID<4){
+
+	printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	ram = NEXT_BLKP(ram);
+	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	
+
+
+void* temp = SWAP(PREV_BLKP(ram), ram);
+
+	printf("AFSWAP SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(temp), GET_ID(temp), GET_ALLOC(temp));
+	ram = NEXT_BLKP(ram);
+	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	
+
+
+
+/*	while(ID<4){
 		while(currentSIZE <MAXSIZE){
 
 			if(GET_SIZE(ram)!=0){
 				printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 				//PUT_SIZE(ram, 64);
 				printf("22SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+
 
 
 				if(GET_ID(ram)==ID){
@@ -82,7 +99,7 @@ int main(int argc, char** argv) {
 
 		ID++;
 	}
-
+*/
 
 
 

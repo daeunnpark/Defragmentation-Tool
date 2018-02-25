@@ -132,16 +132,24 @@ char* SWAP(void* prev, void* p){
 int SIZE = GET_SIZE(prev);
 int ID = GET_ID(prev);
 int FLAG = GET_ALLOC(prev);
-
-
+char temp[GET_SIZE(prev)];
+printf("HERE SWAPS\n");
+memcpy(temp, prev, GET_SIZE(prev));
 memmove(prev, p, GET_SIZE(p));
 
+memcpy(NEXT_BLKP(prev),temp,GET_SIZE(temp));
 printf("HERE: %d %d %d\n", SIZE, ID, FLAG);
 printf("NEW PREV : %d %d %d\n", GET_SIZE(prev), GET_ID(prev), GET_ALLOC(prev));
-
+/*
 PUT_SIZE(NEXT_BLKP(prev),SIZE);
 PUT_ID(NEXT_BLKP(prev),ID);
 PUT_ALLOC(NEXT_BLKP(prev),FLAG); 
+*/
+
+printf("NEW now : %d %d %d\n", GET_SIZE(NEXT_BLKP(prev)), GET_ID(NEXT_BLKP(prev)), GET_ALLOC(NEXT_BLKP(prev)));
+
+
+return prev; 
 
 }
 
