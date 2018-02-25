@@ -3,6 +3,10 @@
 
 void sort(void* bp);
 
+struct Block {
+     void * addr; // addr of header
+// char* = 8 bytes 
+};
 
 int main(int argc, char** argv) {
 	if (*(argv + 1) == NULL) {
@@ -35,11 +39,14 @@ int main(int argc, char** argv) {
 	int firstflag=0;
 	int secondflag=0;
 	int ID = 0;
+void* dptr;
+
 	// Traverse	
 
+struct Block blocks[64]; // max num of blocks in ram
 	printf("-----FROM HERE----\n");
 
-
+/*
 	printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 	ram = NEXT_BLKP(ram);
 	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
@@ -53,19 +60,27 @@ void* temp = SWAP(PREV_BLKP(ram), ram);
 	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 	
 
-
-
-/*	while(ID<4){
+*/
+int index=0;
+//	while(ID<4){
 		while(currentSIZE <MAXSIZE){
 
-			if(GET_SIZE(ram)!=0){
+	/*		if(GET_SIZE(ram)!=0){
 				printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 				//PUT_SIZE(ram, 64);
 				printf("22SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 
+*/
+
+if(GET_ID(ram)!=0){
+dptr = ram;
+
+blocks[index].addr = dptr;
+printf("!!!HH!!!!!\n");
+memmove(tmp_buf,&blocks[index], sizeof(blocks[index]));
 
 
-				if(GET_ID(ram)==ID){
+/*		if(GET_ID(ram)==ID){
 					firstflag = 1;
 					PUT_SIZE(tmp_buf,GET_SIZE(ram)); 
 					PUT_ID(tmp_buf,ID);
@@ -75,12 +90,18 @@ void* temp = SWAP(PREV_BLKP(ram), ram);
 
 				}
 
+*/
 
 
 
-
-				currentSIZE +=GET_SIZE(ram);
+		
+		currentSIZE +=GET_SIZE(ram);
+ printf("%p\n", ram);   
 				ram = NEXT_BLKP(ram);
+tmp_buf = tmp_buf +  sizeof(blocks[index-1]);
+printf("%p\n", ram);
+ printf("THIS at index %d : %p\n",index, blocks[index].addr);
+index++;
 
 			}
 			else{
@@ -96,10 +117,12 @@ void* temp = SWAP(PREV_BLKP(ram), ram);
 		}
 		printf("-- END of Ram -- \n");
 		currentSIZE=0;
+printf("%p\n",blocks[0].addr);
+ printf("%p\n",blocks[1].addr); 
 
-		ID++;
-	}
-*/
+//		ID++;
+//	}
+
 
 
 

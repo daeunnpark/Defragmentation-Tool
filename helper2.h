@@ -4,7 +4,7 @@
 #define DSIZE	8
 //#define PACK
 
-
+//#define PUT(p, val)	(*(unsigned int *)(p)= (val))  
 
 /*
 #define PUTSIZE(p, size)	{
@@ -88,5 +88,4 @@ char* SWAP(void* prev, void* p);
 #define PREV_BLKP(bp)	((char*)(bp) + GET_SIZE(((char*)(bp)-2*DSIZE)))
 
 */
-
 
