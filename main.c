@@ -1,6 +1,7 @@
 #include "helper.h"
 #include "helper2.h"
 
+void sort(void* bp);
 
 
 int main(int argc, char** argv) {
@@ -33,80 +34,140 @@ int main(int argc, char** argv) {
 	int currentSIZE = 0;
 	int firstflag=0;
 	int secondflag=0;
+	int ID = 0;
 	// Traverse	
 
 	printf("-----FROM HERE----\n");
-	while(currentSIZE <MAXSIZE){
 
-		if(GET_SIZE(ram)!=0){
-			printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
-			//PUT_SIZE(ram, 64);
-			printf("22SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	while(ID<4){
+		while(currentSIZE <MAXSIZE){
 
-			if(GET_ID(ram)<GET_ID(NEXT_BLKP(ram))){
-
-				// OK
-
-			}
-			else if (GET_ID(ram)>GET_ID(NEXT_BLKP(ram))) {
-				// Sort ID
-
-			}
-			else { //ram.ID == NEXT_BLKP(ram).ID
-				if(GET_ALLOC(ram) == GET_ALLOC(NEXT_BLKP(ram))){
-					if(GET_SIZE(ram) > GET_SIZE(NEXT_BLKP(ram))){ // Checking size
-						//Sort Size
-					}
-
-				} else { // 0-1 or 1-0
-					if(GET_ALLOC(ram)==0){ // 0-1
-						//Sort Alloc
-
-					}
+			if(GET_SIZE(ram)!=0){
+				printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+				//PUT_SIZE(ram, 64);
+				printf("22SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 
 
+				if(GET_ID(ram)==ID){
+					firstflag = 1;
+					PUT_SIZE(tmp_buf,GET_SIZE(ram)); 
+					PUT_ID(tmp_buf,ID);
+					PUT_ALLOC(tmp_buf, GET_ALLOC(ram));
+					tmp_buf = NEXT_BLKP(tmp_buf);			
+					sort(tmp_buf);
 
 				}
 
 
+
+
+
+				currentSIZE +=GET_SIZE(ram);
+				ram = NEXT_BLKP(ram);
+
+			}
+			else{
+				while( GET_SIZE(ram)==0){
+					ram = ram + 4; //4 bytes
+					currentSIZE+=4;
+					//printf("HHH\n");
+					//printf("currentSIZE: %d \n",currentSIZE);
+				}
 			}
 
 
-
-
-
-
-
-
-
-
-		currentSIZE +=GET_SIZE(ram);
-		ram = NEXT_BLKP(ram);
-
-	}
-	else{
-		while( GET_SIZE(ram)==0){
-			ram = ram + 4; //4 bytes
-			currentSIZE+=4;
-			//printf("HHH\n");
-			//printf("currentSIZE: %d \n",currentSIZE);
 		}
+		printf("-- END of Ram -- \n");
+		currentSIZE=0;
+
+		ID++;
 	}
 
 
+
+
+
+
+	/*
+	 * Do not modify code below.
+	 */
+	cse320_check();
+	cse320_free();
+	return ret;
 }
-printf("-- END of Ram -- \n");
+void sort(void* bp){//, int size, int ID, int flag){
+	// only 1 element
+int ID = GET_ID(bp);
+
+	if(GET_ID(NEXT_BLKP(bp))==0){
+		printf("END OF THE BUFF\n");
+
+	} else {
+		void* first = FIRST_ID_BLKP(bp, ID);
+
+		//		while(GET_ID(NEXT_BLKP(first)==ID){
+		if(GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)){
+			while(GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)){ // Checking size
+				SWAP(PREV_BLKP(bp),bp);
+				if(GET_ALLOC(PREV_BLKP(bp)) != GET_ALLOC(bp)){
+					break;
+
+				}
+			}
+
+
+		} else { // 0-1 or 1-0
+			while( GET_ALLOC(PREV_BLKP(bp))==0 && GET_ALLOC(bp)==1){ // 0-1
+				//Sort Alloc
+				SWAP(PREV_BLKP(bp),bp);
 
 
 
+			}
+
+			while( GET_ALLOC(PREV_BLKP(bp))==1 && GET_ALLOC(bp)==1){ // 0-1
+				while(GET_SIZE(PREV_BLKP(bp))> GET_SIZE(bp)){
+					SWAP(PREV_BLKP(bp),bp);
+
+				}
+
+			}
+		}
 
 
 
+	}
+}	/*
+	   if(GET_ID(ram)<GET_ID(NEXT_BLKP(ram))){
 
-/*
- * Do not modify code below.
- */
-cse320_check();
-cse320_free();
-return ret;
+// OK
+
 }
+else if (GET_ID(ram)>GET_ID(NEXT_BLKP(ram))) {
+// Sort ID
+
+}
+else { //ram.ID == NEXT_BLKP(ram).ID
+if(GET_ALLOC(ram) == GET_ALLOC(NEXT_BLKP(ram))){
+if(GET_SIZE(ram) > GET_SIZE(NEXT_BLKP(ram))){ // Checking size
+//Sort Size
+}
+
+} else { // 0-1 or 1-0
+if(GET_ALLOC(ram)==0){ // 0-1
+//Sort Alloc
+
+}
+
+
+
+}
+
+
+}
+
+
+
+	 */
+
+

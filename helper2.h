@@ -54,9 +54,11 @@ int GET_ALLOC(void* p);
 char* HDRP(void* bp);
 char* FTRP(void* bp);
 char* NEXT_BLKP(void* bp);
-
-
+char* PREV_BLKP(void* bp);
+char* FIRST_ID_BLKP(void* bp,int ID);
+char* FIRST_BLKP(void*bp);
 void initbuf(void* tmp_buf);
+char* SWAP(void* prev, void* p);
 /*
 #define PUTSIZE(p, size)	{
 

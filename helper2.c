@@ -1,7 +1,8 @@
 #include "helper2.h"
 #include <stdio.h>
+#include <string.h>
 #define DSIZE   8  
-
+#define MAXSIZEbuf 1024
 
 
 
@@ -14,9 +15,12 @@ int tester(int x){
 
 void initbuf(void* tmp_buf){
 
-printf("INTI HERE\n");
+	printf("INTI HERE\n");
 	PUT_SIZE(tmp_buf,128);
 	PUT_ID(tmp_buf,0);
+
+	printf("TMP SIZE: %d\n",GET_SIZE(tmp_buf) );
+	tmp_buf += GET_SIZE(tmp_buf);
 }
 /*
  *char HDRP(*char bp){
@@ -36,18 +40,18 @@ void PUT(void* p, int val){
 
 
 void PUT_SIZE(void* p, int size){
-PUT(HDRP(p), (GET(HDRP(p))<<61)>>61 | size);
-PUT(FTRP(p),(GET(FTRP(p))<<61)>>61 | size);
+	PUT(HDRP(p), (GET(HDRP(p))<<61)>>61 | size);
+	PUT(FTRP(p),(GET(FTRP(p))<<61)>>61 | size);
 }
 
 void PUT_ID(void* p, int ID){
-PUT(HDRP(p),GET(HDRP(p)) | ID<<1 );
-PUT(FTRP(p),GET(FTRP(p)) | ID<<1 );
+	PUT(HDRP(p),GET(HDRP(p)) | ID<<1 );
+	PUT(FTRP(p),GET(FTRP(p)) | ID<<1 );
 }
 
 void PUT_ALLOC(void* p, int flag){
-PUT(HDRP(p),GET(HDRP(p)) | flag);
-PUT(FTRP(p),GET(FTRP(p)) | flag);
+	PUT(HDRP(p),GET(HDRP(p)) | flag);
+	PUT(FTRP(p),GET(FTRP(p)) | flag);
 }
 
 // not int?
@@ -69,28 +73,75 @@ int GET_ALLOC(void* p){
 } 
 
 char* HDRP(void* bp){        
-//	return ((char*)(bp)-DSIZE);
-return bp;
+	//	return ((char*)(bp)-DSIZE);
+	return bp;
 }
 
 char* FTRP(void* bp){
-//	return ((char*)(bp)+ GET_SIZE(HDRP(bp))-(2*DSIZE)); 
-return ((char*)(bp)+ DSIZE + GET_SIZE(bp));
+	//	return ((char*)(bp)+ GET_SIZE(HDRP(bp))-(2*DSIZE)); 
+	return ((char*)(bp)+ DSIZE + GET_SIZE(bp));
 }
 
-char*  NEXT_BLKP(void* bp){  
+char* NEXT_BLKP(void* bp){  
 	return ((char*)(bp)+GET_SIZE(bp));
-//return ((char*)FTRP(bp) + DSIZE);
+	//return ((char*)FTRP(bp) + DSIZE);
 
 }
 
+//MAXSIZEbuf can be modified!! put as args?
+//Returns first block with ID
+char* FIRST_ID_BLKP(void* bp, int ID){
+	
+int currentSIZEbuf = 0;
+while (currentSIZEbuf < MAXSIZEbuf){
+		if(GET_ID(bp)!=ID){
+			bp = NEXT_BLKP(bp);
+			currentSIZEbuf+=GET_SIZE(bp);
+		}else{
+			return bp;
 
+		}
+
+	}
+
+	return NULL;
+}
+
+char* PREV_BLKP(void* bp){ 
 /*
- *char PREV_BLKP(bp){ 
+	if(GET_ID(bp)==0){
+		return NULL; // DEFAULT FREE
+	} 
+*/	return ((char*)(bp) - GET_SIZE((char *)(bp)-DSIZE));
+}
 
 
- return (char*)(bp) - GET}
- }
+char* FIRST_BLKP(void* bp){
+	while(GET_ID(bp)!=NULL){
+		if(GET_ID(bp)==0 && GET_SIZE(bp)==128){
+			break;
 
-*/
+		}//else{
+		bp= PREV_BLKP(bp);
+
+	}
+	return bp;
+}
+
+char* SWAP(void* prev, void* p){
+int SIZE = GET_SIZE(prev);
+int ID = GET_ID(prev);
+int FLAG = GET_ALLOC(prev);
+
+
+memmove(prev, p, GET_SIZE(p));
+
+printf("HERE: %d %d %d\n", SIZE, ID, FLAG);
+printf("NEW PREV : %d %d %d\n", GET_SIZE(prev), GET_ID(prev), GET_ALLOC(prev));
+
+PUT_SIZE(NEXT_BLKP(prev),SIZE);
+PUT_ID(NEXT_BLKP(prev),ID);
+PUT_ALLOC(NEXT_BLKP(prev),FLAG); 
+
+}
 
