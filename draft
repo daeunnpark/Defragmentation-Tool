@@ -1,4 +1,6 @@
 §pp§§
+
+
 *void PACK(){
 
 
@@ -28,3 +30,21 @@
 
 
 }
+
+
+/*
+	printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	ram = NEXT_BLKP(ram);
+	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	
+
+
+void* temp = SWAP(PREV_BLKP(ram), ram);
+
+	printf("AFSWAP SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(temp), GET_ID(temp), GET_ALLOC(temp));
+	ram = NEXT_BLKP(ram);
+	printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	
+
+*/
+
