@@ -91,15 +91,15 @@ void sort(void* bp){
 	} else {
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
-			SWAP(PREV_BLKP(bp),bp);
+		//	SWAP(PREV_BLKP(bp),bp);
 		}	
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && ((GET_ALLOC(PREV_BLKP(bp)) == 0) && (GET_ALLOC(bp)== 1)) ){
-			SWAP(PREV_BLKP(bp),bp);
+		//	SWAP(PREV_BLKP(bp),bp);
 		}
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && (GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)) && (GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)) ){
-			SWAP(PREV_BLKP(bp),bp);
+		//	SWAP(PREV_BLKP(bp),bp);
 		}
 	}
 
