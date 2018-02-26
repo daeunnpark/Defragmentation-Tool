@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
 			printf("!!!HH!!!!!\n");
 			memmove(tmp_buf, ram , GET_SIZE(ram));
-			sort(tmp_buf);		
+	//		sort(tmp_buf);		
 
 			ram = NEXT_BLKP(ram);
 			RAM_SIZE+=GET_SIZE(ram);
