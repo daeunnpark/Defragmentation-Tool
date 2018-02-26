@@ -71,13 +71,6 @@ int main(int argc, char** argv) {
 	}
 	printf("-- END of Ram -- \n");
 
-	//		ID++;
-	//	}
-
-
-
-
-
 
 	/*
 	 * Do not modify code below.
@@ -85,10 +78,10 @@ int main(int argc, char** argv) {
 	cse320_check();
 	cse320_free();
 	return ret;
-	}
+}
 
 
-void sort(void* bp, int BUF_SIZE){//, int size, int ID, int flag){
+void sort(void* bp){
 	// only 1 element
 	int ID = GET_ID(bp);
 
@@ -96,20 +89,62 @@ void sort(void* bp, int BUF_SIZE){//, int size, int ID, int flag){
 		printf("END OF THE BUFF\n");
 
 	} else {
-		
-while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
-			SWAP();
+
+		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
+			SWAP(PREV_BLKP(bp),bp);
 		}	
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && ((GET_ALLOC(PREV_BLKP(bp)) == 0) && (GET_ALLOC(bp)== 1)) ){
-			SWAP();
+			SWAP(PREV_BLKP(bp),bp);
 		}
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && (GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)) && (GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)) ){
-			SWAP(); 
+			SWAP(PREV_BLKP(bp),bp);
 		}
 	}
 
+}
+
+
+// !=Null to add
+void * coalesce(void *bp){
+
+
+	int prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
+	int next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
+	size_t size = GET_SIZE(HDRP(bp));
+
+
+
+	if(prev_alloc && next_alloc){ // 1-- --1
+		return bp;
+
+	} else if(prev_alloc && !next_alloc){ // 1-- --0
+		size+=GET_SIZE(HDRP(NEXT_BLKP(bp)));
+
+		PUT_SIZE(HDRP(bp),size); 
+		PUT_SIZE(FTRP(NEXT_BLKP(bp)), size);  
+
+
+	} else if(!prev_alloc && next_alloc){ // 0-- --1
+		size+=GET_SIZE(FTRP(PREV_BLKP(bp)));
+
+		PUT_SIZE(FTRP(bp), size);  
+		PUT_SIZE(HDRP(PREV_BLKP(bp)),size); 
+
+		bp = PREV_BLKP(bp);
+
+
+
+	} else { // 0-- --0 
+		size+=GET_SIZE(FTRP(PREV_BLKP(bp)))+ GET_SIZE(HDRP(NEXT_BLKP(bp)));
+
+		PUT_SIZE(HDRP(PREV_BLKP(bp)),size);
+		PUT_SIZE(FTRP(NEXT_BLKP(bp)), size); 
+		bp= PREV_BLKP(bp);
+	}
+
+	return bp;
 }
 
 

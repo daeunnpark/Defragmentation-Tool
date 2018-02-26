@@ -1,5 +1,38 @@
 §pp§§
 
+char* FIRST_BLKP(void* bp){
+	while(GET_ID(bp)!=NULL){
+		if(GET_ID(bp)==0 && GET_SIZE(bp)==128){
+			break;
+
+		}//else{
+		bp= PREV_BLKP(bp);
+
+	}
+	return bp;
+	}
+
+
+//MAXSIZEbuf can be modified!! put as args?
+//Returns first block with ID
+char* FIRST_ID_BLKP(void* bp, int ID){
+
+	int currentSIZEbuf = 0;
+	while (currentSIZEbuf < MAXSIZEbuf){
+		if(GET_ID(bp)!=ID){
+			bp = NEXT_BLKP(bp);
+			currentSIZEbuf+=GET_SIZE(bp);
+		}else{
+			return bp;
+
+		}
+
+	}
+
+	return NULL;
+}
+
+
 
 *void PACK(){
 
