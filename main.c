@@ -59,8 +59,10 @@ int main(int argc, char** argv) {
 
 		}
 		else{
-			while( GET_SIZE(ram)==0){
-				ram = ram + 4; //4 bytes
+
+if (RAM_SIZE+4 < MAXSIZE){
+		//	while( GET_SIZE(ram)==0){
+				ram += 4; //4 bytes
 				RAM_SIZE+=4;
 				//printf("HHH\n");
 				//printf("currentSIZE: %d \n",currentSIZE);
@@ -92,10 +94,12 @@ void sort(void* bp){
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
 		//	SWAP(PREV_BLKP(bp),bp);
+break;
 		}	
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && ((GET_ALLOC(PREV_BLKP(bp)) == 0) && (GET_ALLOC(bp)== 1)) ){
 		//	SWAP(PREV_BLKP(bp),bp);
+
 		}
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && (GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)) && (GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)) ){
