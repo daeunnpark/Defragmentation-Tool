@@ -53,8 +53,9 @@ int GET_ALLOC(void* p);
 
 char* HDRP(void* bp);
 char* FTRP(void* bp);
-char* NEXT_BLKP(void* bp);
-char* PREV_BLKP(void* bp);
+char* NEXT_BLKP_RAM(void* bp, int *max_size);
+char* NEXT_BLKP_BUF(void* bp, int *BUF_SIZE, int MAX_BUF_SIZE);
+char* PREV_BLKP(void* bp, *int size);
 char* FIRST_ID_BLKP(void* bp,int ID);
 char* FIRST_BLKP(void*bp);
 void initbuf(void* tmp_buf);

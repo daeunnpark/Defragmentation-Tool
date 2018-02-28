@@ -1,6 +1,9 @@
 #include "helper.h"
 #include "helper2.h"
 #define MAXSIZE	1024
+#define TEMP_RAM_SIZE 128
+
+
 void sort(void* bp);
 
 struct Block {
@@ -23,8 +26,10 @@ int main(int argc, char** argv) {
 
 	initbuf(tmp_buf);
 	//int MAXSIZE = 1024;// bytes
-	int RAM_SIZE = 0;
-	int BUF_SIZE=0;
+	int *RAM_SIZE = 0;
+	int *BUF_SIZE=0;
+	ssize_t INCR_BUF_SIZE=0;
+	int *MAX_BUF_SIZE=128;
 	int firstflag=0;
 	int secondflag=0;
 	int ID = 0;
@@ -32,7 +37,6 @@ int main(int argc, char** argv) {
 
 	// Traverse	
 
-	struct Block blocks[64]; // max num of blocks in ram
 	printf("-----FROM HERE----\n");
 
 	/*
@@ -42,36 +46,80 @@ int main(int argc, char** argv) {
 
 
 	 */
-	while(RAM_SIZE < MAXSIZE){
 
-		if(GET_ID(ram)!=0){
+
+	while(RAM_SIZE + GET_SIZE(ram) < MAXSIZE+1){
+
+		if(GET_ID(ram)==1 || GET_ID(ram)==2 || GET_ID(ram)==3){
 
 			printf("!!!HH!!!!!\n");
+
+
+			if(BUF_SIZE+GET_SIZE(ram)+1 >  MAX_BUF_SIZE){
+				ssize_t size = BUF_SIZE+GET_SIZE(ram)+1 - MAX_BUF_SIZE;
+				INCR_BUF_SIZE+=size;
+
+				if(cse320_sbrk(size)==NULL){
+
+					printf("SBRK_ERROR\n");
+					exit(errno);
+				}
+
+			}				
 			memmove(tmp_buf, ram , GET_SIZE(ram));
-	//		sort(tmp_buf);		
-
-			ram = NEXT_BLKP(ram);
-			RAM_SIZE+=GET_SIZE(ram);
-
-			tmp_buf = NEXT_BLKP(tmp_buf);
-			BUF_SIZE+=GET_SIZE(tmp_buf);
+			sort(tmp_buf);		
 
 
-		}
-		else{
+			//	RAM_SIZE+=GET_SIZE(ram);
+			ram = NEXT_BLKP_RAM(ram, RAM_SIZE);
 
-if (RAM_SIZE+4 < MAXSIZE){
-		//	while( GET_SIZE(ram)==0){
+			//	BUF_SIZE+=GET_SIZE(tmp_buf);
+			tmp_buf = NEXT_BLKP(tmp_buf,BUF_SIZE,MAX_BUF_SIZE+INCR_BUF_SIZE);
+
+
+
+		} else {
+
+			if ( RAM_SIZE+4 < MAXSIZE+1 ){
 				ram += 4; //4 bytes
 				RAM_SIZE+=4;
-				//printf("HHH\n");
-				//printf("currentSIZE: %d \n",currentSIZE);
 			}
 		}
 
 
 	}
 	printf("-- END of Ram -- \n");
+	// Not enough mem in Ram for last block
+
+	if(RAM_SIZE+16< MAXSIZE+1){
+
+		printf("SBRK_ERROR\n");
+		exit("ENOMEM");
+	}
+
+	int saveSIZE= RAM_SIZE;
+	int finalsize = saveSIZE+GET_SIZE(ram);
+
+
+
+
+	while(PREV_BLKP(ram)!= NULL){
+		ram = PREV_BLKP(ram, RAM_SIZE);
+	}
+
+	while(PREV_BLKP(tmp_buf)!= NULL){
+		tmp_buf = PREV_BLKP(tmp_buf,BUF_SIZE);
+	}
+
+
+
+	memcopy(ram, tmp_buf,finalsize);		//LAST BLOCK
+	PUT_SIZE(HDRP(ram),16);
+	PUT_SIZE(FTRP(ram),16);
+	PUT_ID(HDRP(ram),0);
+	PUT_ID(FTRP(ram),0);
+	PUT_ALLOC(HDRP(ram),0);
+	PUT_ALLOC(FTRP(ram),0);
 
 
 	/*
@@ -87,23 +135,23 @@ void sort(void* bp){
 	// only 1 element
 	int ID = GET_ID(bp);
 
-	if(GET_ID(NEXT_BLKP(bp))==0){
+	if(GET_ID(NEXT_BLKP_BUF)==0){
 		printf("END OF THE BUFF\n");
 
 	} else {
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
-		//	SWAP(PREV_BLKP(bp),bp);
-break;
+			SWAP(PREV_BLKP(bp),bp);
+			break;
 		}	
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && ((GET_ALLOC(PREV_BLKP(bp)) == 0) && (GET_ALLOC(bp)== 1)) ){
-		//	SWAP(PREV_BLKP(bp),bp);
+			SWAP(PREV_BLKP(bp),bp);
 
 		}
 
 		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && (GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)) && (GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)) ){
-		//	SWAP(PREV_BLKP(bp),bp);
+			SWAP(PREV_BLKP(bp),bp);
 		}
 	}
 
@@ -111,7 +159,7 @@ break;
 
 
 // !=Null to add
-void * coalesce(void *bp){
+void * coalesce(void *bp,int RAM_SIZE){
 
 
 	int prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
@@ -136,7 +184,7 @@ void * coalesce(void *bp){
 		PUT_SIZE(FTRP(bp), size);  
 		PUT_SIZE(HDRP(PREV_BLKP(bp)),size); 
 
-		bp = PREV_BLKP(bp);
+		bp= PREV_BLKP(bp,RAM_SIZE);
 
 
 
@@ -145,7 +193,7 @@ void * coalesce(void *bp){
 
 		PUT_SIZE(HDRP(PREV_BLKP(bp)),size);
 		PUT_SIZE(FTRP(NEXT_BLKP(bp)), size); 
-		bp= PREV_BLKP(bp);
+		bp= PREV_BLKP(bp,RAM_SIZE);
 	}
 
 	return bp;

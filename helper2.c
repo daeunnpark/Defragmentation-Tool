@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #define DSIZE   8  
-#define MAXSIZEbuf 1024
+#define MAXSIZE2 1024
 
 
 
@@ -81,18 +81,37 @@ char* FTRP(void* bp){
 	return ((char*)(bp) + GET_SIZE(bp) - DSIZE);
 }
 //Header of NEXT
-char* NEXT_BLKP(void* bp){  
-	return ((char*)(bp)+GET_SIZE(bp));
+char* NEXT_BLKP_RAM(void* bp, int* RAM_SIZE){  
+RAM_SIZE+=GET_SIZE(bp);	
+if( MAXSIZE2 < RAM_SIZE){
+return NULL;
+}
+
+return ((char*)(bp)+GET_SIZE(bp));
 	//return ((char*)FTRP(bp) + DSIZE);
 
 }
+
+//Header of NEXT
+char* NEXT_BLKP_BUF(void* bp, int *BUF_SIZE, int MAX_BUF_SIZE){  
+BUF_SIZE+=GET_SIZE(bp);
+if( MAX_BUF_SIZE < BUF_SIZE ){
+return NULL;
+}
+
+return ((char*)(bp)+GET_SIZE(bp));
+	//return ((char*)FTRP(bp) + DSIZE);
+
+}
+
+
 //Header of PREV
-char* PREV_BLKP(void* bp){ 
-	/*
-	   if(GET_ID(bp)==0){
+char* PREV_BLKP(void* bp, int *size){ 
+size-=GET_SIZE(bp);	
+	   if(size<0){
 	   return NULL; // DEFAULT FREE
 	   } 
-	 */	
+	 	
 return ((char*)(bp) - GET_SIZE((char *)(bp)-DSIZE));
 }
 
