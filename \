@@ -1,0 +1,239 @@
+#include "helper.h"
+#include "helper2.h"
+#define MAXSIZE	1024
+#define TEMP_RAM_SIZE 128
+
+
+void sort(void* bp);
+
+struct Block {
+	void * addr; // addr of header
+	// char* = 8 bytes 
+};
+
+int main(int argc, char** argv) {
+	if (*(argv + 1) == NULL) {
+		printf("You should provide name of the test file.\n");
+		return 1;
+	}
+	void* ram = cse320_init(*(argv + 1));
+	void* tmp_buf = cse320_tmp_buffer_init();
+	int ret = 0;
+	/*
+	 * You code goes below. Do not modify provided parts
+	 * of the code.
+	 */
+
+	initbuf(tmp_buf);
+	//int MAXSIZE = 1024;// bytes
+	int *RAM_SIZE = 0;
+	int *BUF_SIZE=0;
+	ssize_t INCR_BUF_SIZE=0;
+	int *MAX_BUF_SIZE=128;
+	int firstflag=0;
+	int secondflag=0;
+	int ID = 0;
+	void* dptr;
+
+	// Traverse	
+
+	printf("-----FROM HERE----\n");
+
+	/*
+	   printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+	   ram = NEXT_BLKP(ram);
+	   printf("NEXT SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
+
+
+	 */
+
+
+	while(RAM_SIZE + GET_SIZE(ram) < MAXSIZE+1){
+
+		if(GET_ID(ram)==1 || GET_ID(ram)==2 || GET_ID(ram)==3){
+
+			printf("!!!HH!!!!!\n");
+
+
+			if(BUF_SIZE+GET_SIZE(ram)+1 >  MAX_BUF_SIZE + INCR_BUF_SIZE){
+				ssize_t size = BUF_SIZE+GET_SIZE(ram)+1 - MAX_BUF_SIZE + INCR_BUF_SIZE;
+				INCR_BUF_SIZE+=size;
+
+				if(cse320_sbrk(size)==NULL){
+
+					printf("SBRK_ERROR\n");
+					exit(errno);
+				}
+
+			}				
+			memmove(tmp_buf, ram , GET_SIZE(ram));
+			sort(tmp_buf);		
+
+
+			//	RAM_SIZE+=GET_SIZE(ram);
+			ram = NEXT_BLKP_RAM(ram, RAM_SIZE);
+
+			//	BUF_SIZE+=GET_SIZE(tmp_buf);
+			tmp_buf = NEXT_BLKP_BUF(tmp_buf, BUF_SIZE, MAX_BUF_SIZE+INCR_BUF_SIZE);
+
+
+
+		} else {
+
+			if ( RAM_SIZE+4 < MAXSIZE+1 ){
+				ram += 4; //4 bytes
+				RAM_SIZE+=4;
+			}
+		}
+
+
+	}
+	printf("-- END of Ram -- \n");
+	// Not enough mem in Ram for last block
+
+	if(RAM_SIZE+16< MAXSIZE+1){
+
+		printf("SBRK_ERROR\n");
+		exit("ENOMEM");
+	}
+
+	int saveSIZE= RAM_SIZE;
+	int finalsize = saveSIZE+GET_SIZE(ram);
+
+
+
+
+	while(PREV_BLKP(ram)!= NULL){
+		ram = PREV_BLKP(ram, RAM_SIZE);
+	}
+
+	while(PREV_BLKP(tmp_buf)!= NULL){
+		tmp_buf = PREV_BLKP(tmp_buf,BUF_SIZE);
+	}
+
+	coalesce(ram,RAM_SIZE);
+
+	memcopy(ram, tmp_buf,finalsize);		//LAST BLOCK
+	PUT_SIZE(HDRP(ram),16);
+	PUT_SIZE(FTRP(ram),16);
+	PUT_ID(HDRP(ram),0);
+	PUT_ID(FTRP(ram),0);
+	PUT_ALLOC(HDRP(ram),0);
+	PUT_ALLOC(FTRP(ram),0);
+
+
+
+	while(PREV_BLKP(ram)!= NULL){
+		ram = PREV_BLKP(ram, RAM_SIZE);
+	}
+
+
+
+	/*
+	 * Do not modify code below.
+	 */
+	cse320_check();
+	cse320_free();
+	return ret;
+}
+
+
+void sort(void* bp){
+	// only 1 element
+	int ID = GET_ID(bp);
+
+	if(GET_ID(NEXT_BLKP_BUF)==0){
+		printf("END OF THE BUFF\n");
+
+	} else {
+
+		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) > GET_ID(bp)) ){
+			SWAP(PREV_BLKP(bp),bp);
+			break;
+		}	
+
+		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && ((GET_ALLOC(PREV_BLKP(bp)) == 0) && (GET_ALLOC(bp)== 1)) ){
+			SWAP(PREV_BLKP(bp),bp);
+
+		}
+
+		while( (PREV_BLKP(bp)!= NULL) && (GET_ID(PREV_BLKP(bp)) == GET_ID(bp)) && (GET_ALLOC(PREV_BLKP(bp)) == GET_ALLOC(bp)) && (GET_SIZE(PREV_BLKP(bp)) > GET_SIZE(bp)) ){
+			SWAP(PREV_BLKP(bp),bp);
+		}
+	}
+
+
+	while(PREV_BLKP(bp)!= NULL){
+		bp = PREV_BLKP(bp,BUF_SIZE);
+	}
+
+	while(bp!=NULL){
+
+		printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(bp), GET_ID(bp), GET_ALLOC(bp));
+		bp = NEXT_BLKP_RAM((bp),&RAM_SIZE); 
+	}
+
+
+}
+
+
+// bp = first block in ram
+void coalesce(void *bp,int RAM_SIZE){
+
+	// Start at 2nd block to avoid 1st with prev
+	bp = NEXT_BLKP_RAM((bp),&RAM_SIZE);
+
+
+	while(HDRP(NEXT_BLKP_C(bp),&RAM_SIZE)!=NULL){
+		int prev_alloc = GET_ALLOC(FTRP(PREV_BLKP_C(bp),&RAM_SIZE));
+		int next_alloc = GET_ALLOC(HDRP(NEXT_BLKP_C(bp),&RAM_SIZE));
+		size_t size = GET_SIZE(HDRP(bp));
+
+
+
+		if(prev_alloc && next_alloc){ // 1-- --1
+			return bp;
+
+		} else if(prev_alloc && !next_alloc){ // 1-- --0
+			size+=GET_SIZE(HDRP(NEXT_BLKP(bp)));
+
+			PUT_SIZE(HDRP(bp),size); 
+			PUT_SIZE(FTRP(NEXT_BLKP(bp)), size);  
+
+
+		} else if(!prev_alloc && next_alloc){ // 0-- --1
+			size+=GET_SIZE(FTRP(PREV_BLKP(bp)));
+
+			PUT_SIZE(FTRP(bp), size);  
+			PUT_SIZE(HDRP(PREV_BLKP(bp)),size); 
+
+			bp= PREV_BLKP(bp,RAM_SIZE);
+
+
+
+		} else { // 0-- --0 
+			size+=GET_SIZE(FTRP(PREV_BLKP(bp)))+ GET_SIZE(HDRP(NEXT_BLKP(bp)));
+
+			PUT_SIZE(HDRP(PREV_BLKP(bp)),size);
+			PUT_SIZE(FTRP(NEXT_BLKP(bp)), size); 
+
+			bp= PREV_BLKP(bp,RAM_SIZE);
+		}
+		bp = NEXT_BLKP_RAM(bp, &RAM_SIZE);
+
+	}
+	// RESET RAM ptr
+	while(PREV_BLKP(bp)!= NULL){
+		bp = PREV_BLKP(bp, RAM_SIZE);
+	}
+
+
+
+	return bp;
+}
+
+
+
+
+
+

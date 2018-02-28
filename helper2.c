@@ -10,17 +10,6 @@ int tester(int x){
 	return x+2;
 }
 
-
-void initbuf(void* tmp_buf){
-
-	printf("INTI HERE\n");
-	PUT_SIZE(tmp_buf,128);
-	PUT_ID(tmp_buf,0);
-
-	printf("TMP SIZE: %d\n",GET_SIZE(tmp_buf) );
-	tmp_buf += GET_SIZE(tmp_buf);
-}
-
 void PUT(void* p, int val){
 	(*(unsigned int *)(p)= (val)); 
 }
@@ -59,7 +48,8 @@ int GET(void* p){
 }
 
 
-int GET_SIZE(void* p){   
+int GET_SIZE(void* p){
+printf("rrrr\n");   
 	return ((GET(p) >>3)<<3);
 }
 
@@ -71,31 +61,34 @@ int GET_ALLOC(void* p){
 	return (GET(p) & 0x1);
 } 
 
-char* HDRP(void* bp){        
+void* HDRP(void* bp){        
 	//	return ((char*)(bp)-DSIZE);
 	return bp;
 }
 //Footer of bp
-char* FTRP(void* bp){
+void* FTRP(void* bp){
 	//	return ((char*)(bp)+ GET_SIZE(HDRP(bp))-(2*DSIZE)); 
 	return ((char*)(bp) + GET_SIZE(bp) - DSIZE);
 }
+
 //Header of NEXT
-char* NEXT_BLKP_RAM(void* bp, int* RAM_SIZE){  
+void* NEXT_BLKP_RAM(void* bp, int* RAM_SIZE){  
+/*
 RAM_SIZE+=GET_SIZE(bp);	
-if( MAXSIZE2 < RAM_SIZE){
+
+if( MAXSIZE2 < *RAM_SIZE){
 return NULL;
 }
-
+*/
 return ((char*)(bp)+GET_SIZE(bp));
 	//return ((char*)FTRP(bp) + DSIZE);
 
 }
 
 //Header of NEXT
-char* NEXT_BLKP_BUF(void* bp, int *BUF_SIZE, int MAX_BUF_SIZE){  
+void* NEXT_BLKP_BUF(void* bp, int *BUF_SIZE, int MAX_BUF_SIZE){  
 BUF_SIZE+=GET_SIZE(bp);
-if( MAX_BUF_SIZE < BUF_SIZE ){
+if( MAX_BUF_SIZE < *BUF_SIZE ){
 return NULL;
 }
 
@@ -103,10 +96,9 @@ return ((char*)(bp)+GET_SIZE(bp));
 	//return ((char*)FTRP(bp) + DSIZE);
 
 }
-
 
 //Header of PREV
-char* PREV_BLKP(void* bp, int *size){ 
+void* PREV_BLKP(void* bp, int *size){ 
 size-=GET_SIZE(bp);	
 	   if(size<0){
 	   return NULL; // DEFAULT FREE
@@ -116,7 +108,30 @@ return ((char*)(bp) - GET_SIZE((char *)(bp)-DSIZE));
 }
 
 
-char* SWAP(void* prev, void* p){
+
+// For Coalescing
+void* NEXT_BLKP_C(void* bp, int* RAM_SIZE){  
+//RAM_SIZE+=GET_SIZE(bp);	
+if( MAXSIZE2 < *RAM_SIZE){
+return NULL;
+}
+
+return ((char*)(bp)+GET_SIZE(bp));
+	//return ((char*)FTRP(bp) + DSIZE);
+
+}
+void* PREV_BLKP_C(void* bp, int *size){ 
+//size-=GET_SIZE(bp);	
+	   if(size<0){
+	   return NULL; // DEFAULT FREE
+	   } 
+	 	
+return ((char*)(bp) - GET_SIZE((char *)(bp)-DSIZE));
+}
+
+
+
+void* SWAP(void* prev, void* p, int *BUF_SIZE){
 	int SIZE = GET_SIZE(prev);
 	int ID = GET_ID(prev);
 	int FLAG = GET_ALLOC(prev);
@@ -125,13 +140,16 @@ char* SWAP(void* prev, void* p){
 
 	memcpy(temp, prev, GET_SIZE(prev));
 	memmove(prev, p, GET_SIZE(p));
-	memcpy(NEXT_BLKP(prev),temp,GET_SIZE(temp));
-	
+	memcpy(NEXT_BLKP_C(prev, BUF_SIZE),temp,GET_SIZE(temp));
+	BUF_SIZE-=GET_SIZE(prev);
 printf("HERE: %d %d %d\n", SIZE, ID, FLAG);
 	printf("NEW PREV : %d %d %d\n", GET_SIZE(prev), GET_ID(prev), GET_ALLOC(prev));
-	printf("NEW now : %d %d %d\n", GET_SIZE(NEXT_BLKP(prev)), GET_ID(NEXT_BLKP(prev)), GET_ALLOC(NEXT_BLKP(prev)));
+	printf("NEW now : %d %d %d\n", GET_SIZE(NEXT_BLKP_C(prev,BUF_SIZE)), GET_ID(NEXT_BLKP_C(prev, BUF_SIZE)), GET_ALLOC(NEXT_BLKP_C(prev,BUF_SIZE)));
 
 	return prev; 
 
 }
+
+
+
 
