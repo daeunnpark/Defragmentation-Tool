@@ -19,13 +19,10 @@ int GET_ALLOC(void* p);
 
 void* HDRP(void* bp);
 void* FTRP(void* bp);
-void* NEXT_BLKP_RAM(void* bp, int* max_size);
-void* NEXT_BLKP_BUF(void* bp, int* BUF_SIZE, int MAX_BUF_SIZE);
-void* PREV_BLKP(void* bp, int* size);
-void* NEXT_BLKP_C(void* bp, int* size);
-void* PREV_BLKP_C(void* bp, int* size);
+void* PREV_BLKP(void* bp);
+void* NEXT_BLKP(void* bp);
 
-void* SWAP(void* prev, void* p, int* size);
+void* SWAP(void* prev, void* p);
 
 //void initbuf(void* tmp_buf);
 

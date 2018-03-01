@@ -1,4 +1,35 @@
-§pp§§
+§
+		if(prev_alloc && next_alloc){ // 1--1
+			
+RAM_COUNT+=size;
+		} else if(prev_alloc && !next_alloc){ // 1-- --0
+			size+=GET_SIZE(HDRP(NEXT_BLKP_C(bp,&RAM_SIZE)));
+
+			PUT_SIZE(HDRP(bp),size); 
+			PUT_SIZE(FTRP(NEXT_BLKP_C(bp, &RAM_SIZE)), size);  
+
+
+		} else if(!prev_alloc && next_alloc){ // 0-- --1
+			size+=GET_SIZE(FTRP(PREV_BLKP_C(bp, &RAM_SIZE)));
+
+			PUT_SIZE(FTRP(bp), size);  
+			PUT_SIZE(HDRP(PREV_BLKP_C(bp, &RAM_SIZE)),size); 
+
+			bp= PREV_BLKP(bp, &RAM_SIZE);
+
+
+
+		} else { // 0-- --0 
+			size+=GET_SIZE(FTRP(PREV_BLKP_C(bp,&RAM_SIZE)))+ GET_SIZE(HDRP(NEXT_BLKP_C(bp,&RAM_SIZE)));
+
+			PUT_SIZE(HDRP(PREV_BLKP_C(bp, &RAM_SIZE)),size);
+			PUT_SIZE(FTRP(NEXT_BLKP_C(bp,&RAM_SIZE)), size); 
+
+			bp= PREV_BLKP(bp,&RAM_SIZE);
+		}
+		bp = NEXT_BLKP_RAM(bp, &RAM_SIZE);
+
+	pp§§
 
 char* FIRST_BLKP(void* bp){
 	while(GET_ID(bp)!=NULL){
