@@ -4,17 +4,22 @@
 #define TEMP_RAM_SIZE 128
 
 
+struct block {
+	void *addr; // addr of header
+	int size;
+	int ID;
+	int flag;
+	struct block *next;
+	struct block *prev;
+
+};
+
 void* sort(void* bp, int BUF_SIZE);
 void print_RAM(void* bp, int RAM_COUNT);
-//void print_BUF(void* bp, int COUNT);
 void* coalesce(void *bp,int RAM_SIZE);
+void printLL(struct block *head);
+void* createLL(void *ram);
 
-
-
-struct Block {
-	void * addr; // addr of header
-	// char* = 8 bytes 
-};
 
 int main(int argc, char** argv) {
 	if (*(argv + 1) == NULL) {
@@ -29,19 +34,15 @@ int main(int argc, char** argv) {
 	 * of the code.
 	 */
 
-	int RAM_COUNT = 0;
-	int BUF_COUNT=0;
-	ssize_t INCR_BUF_SIZE=0;
-	int MAX_BUF_SIZE = 128;
-	int firstflag=0;
-	int secondflag=0;
-	int ID = 0;
-	void* cursor;
+
+
+	void* RAM_cursor;
 	void* BUF_cursor;
-	// Traverse	
+	struct block* LLhead;
+
 
 	printf("-----FROM HERE----\n");
-	print_RAM(ram,160);
+	//	print_RAM(ram,160);
 	/*
 	   printf("SIZE: %d ID : %d ALLOC : %d \n", GET_SIZE(ram), GET_ID(ram), GET_ALLOC(ram));
 	   ram = NEXT_BLKP(ram);
@@ -50,99 +51,44 @@ int main(int argc, char** argv) {
 
 	 */
 
-	cursor = ram;
+	// Initialize cursor
+	RAM_cursor = ram;
 	BUF_cursor = tmp_buf;
-	while(RAM_COUNT + GET_SIZE(cursor) < MAXSIZE+1){
 
-		if(GET_ID(cursor)==1 || GET_ID(cursor)==2 || GET_ID(cursor)==3){
-
-			printf("!!!HH!!!!!\n");
-
-			// Not enough BUF
-			if(BUF_COUNT + GET_SIZE(cursor) >  MAX_BUF_SIZE){
-				if(MAX_BUF_SIZE < MAXSIZE+1){			
-					ssize_t size = BUF_COUNT+GET_SIZE(cursor) - MAX_BUF_SIZE;
-					//	INCR_BUF_SIZE+=size;
-					printf("-----SBRK-----\n");
-					if(cse320_sbrk(size)==NULL){
-						//	printf(errno);
-						perror("");					
-						exit(errno);
-					}
-					BUF_COUNT+=GET_SIZE(cursor);
-					MAX_BUF_SIZE+=size;
-				}
-				printf("Print error\n");
-
-			}			
-			memmove(BUF_cursor, cursor , GET_SIZE(cursor));
-			printf("ddd\n");  
-			BUF_COUNT+=GET_SIZE(BUF_cursor);
-			printf("BUF COuNT: %d\n", BUF_COUNT);
-			printf("aaaa\n");		
-
-			print_RAM(tmp_buf,BUF_COUNT);
-
-			printf("sss\n");  		
-			sort(BUF_cursor,BUF_COUNT-GET_SIZE(tmp_buf));		
-			printf("kkk\n");  	
-			printf("After: %p\n",tmp_buf); 		
-				print_RAM(tmp_buf,BUF_COUNT);
-
-
-			RAM_COUNT+=GET_SIZE(ram);
-			cursor = NEXT_BLKP(cursor);
-
-
-			BUF_cursor = NEXT_BLKP(BUF_cursor);
+	LLhead = createLL(ram);
+	printLL(LLhead);
 
 
 
-		} else {
-
-			if ( RAM_COUNT+4 < MAXSIZE+1 ){
-				ram += 4; //4 bytes
-				RAM_COUNT+=4;
-			}
-
-			else{
-
-				printf("-- END of Ram222 -- \n");
-				break;
-			}
-		}
 
 
+	/*
+	   if(RAM_COUNT+16 < MAXSIZE+1){
+	   errno=ENOMEM;
+	   printf("SBRK_ERROR\n");
 
-	}
-	printf("-- END of Ram -- \n");
-	// Not enough mem in Ram for last block
+	   exit(errno);
+	   }
 
-	if(RAM_COUNT+16 < MAXSIZE+1){
-		errno=ENOMEM;
-		printf("SBRK_ERROR\n");
-
-		exit(errno);
-	}
-
-
+	 */
 
 
 	// GET FIRST BLOCK
-	while(-1< RAM_COUNT-GET_SIZE(PREV_BLKP(ram))){
-		RAM_COUNT-=GET_SIZE(PREV_BLKP(ram));
-		ram = PREV_BLKP(ram);
-	}
+	/*
+	   while(-1< RAM_COUNT-GET_SIZE(PREV_BLKP(ram))){
+	   RAM_COUNT-=GET_SIZE(PREV_BLKP(ram));
+	   ram = PREV_BLKP(ram);
+	   }
 
-	while(-1<BUF_COUNT - GET_SIZE(PREV_BLKP(tmp_buf))){
-		BUF_COUNT-=GET_SIZE(PREV_BLKP(tmp_buf));
-		tmp_buf = PREV_BLKP (tmp_buf);
-	}
+	   while(-1<BUF_COUNT - GET_SIZE(PREV_BLKP(tmp_buf))){
+	   BUF_COUNT-=GET_SIZE(PREV_BLKP(tmp_buf));
+	   tmp_buf = PREV_BLKP (tmp_buf);
+	   }
 
 
-	memcpy(ram, tmp_buf,BUF_COUNT);		//LAST BLOCK
-	ram = coalesce(ram,RAM_COUNT); // ram points at last block
-
+	   memcpy(ram, tmp_buf,BUF_COUNT);		//LAST BLOCK
+	   ram = coalesce(ram,RAM_COUNT); // ram points at last block
+	 
 
 	PUT_SIZE(HDRP(ram),16);
 	PUT_SIZE(FTRP(ram),16);
@@ -150,13 +96,13 @@ int main(int argc, char** argv) {
 	PUT_ID(FTRP(ram),0);
 	PUT_ALLOC(HDRP(ram),0);
 	PUT_ALLOC(FTRP(ram),0);
+	
+	   while(-1< RAM_COUNT-GET_SIZE(PREV_BLKP(ram))){
+	   RAM_COUNT-=GET_SIZE(PREV_BLKP(ram));
+	   ram = PREV_BLKP(ram);
+	   }
 
-	while(-1< RAM_COUNT-GET_SIZE(PREV_BLKP(ram))){
-		RAM_COUNT-=GET_SIZE(PREV_BLKP(ram));
-		ram = PREV_BLKP(ram);
-	}
-
-
+	 */
 	/*
 	 * Do not modify code below.
 	 */
@@ -168,8 +114,9 @@ int main(int argc, char** argv) {
 
 void* sort(void *bp, int BUF_COUNT){
 	// only 1 element
-
+	int BUF_COUNT2 = BUF_COUNT;
 	int totalSIZE=0;
+	int BUF_SIZE = BUF_COUNT+GET_SIZE(bp);
 
 	if(BUF_COUNT==0){
 		printf("1 to SORT\n");
@@ -198,11 +145,13 @@ void* sort(void *bp, int BUF_COUNT){
 		}
 
 		printf("SORTED\n");
-
+		printf("BUF COUNT IN SORT: %d\n", BUF_COUNT);
+		printf("totalSIZE IN SORT: %d\n", totalSIZE);
+		printf("BUF COUNT IN SORT: %d\n", GET_SIZE(bp));  
 		//Last block
-		printf("BUF COUNT MUST BE 0: %d\n",BUF_COUNT);
-		while(BUF_COUNT+ GET_SIZE(bp)<totalSIZE+1){
-
+		//printf("BUF COUNT MUST BE 0: %d\n",BUF_COUNT);
+		while(BUF_COUNT+ GET_SIZE(bp)<totalSIZE){
+			printf("GG\n");
 			BUF_COUNT+= GET_SIZE(bp);
 			bp = NEXT_BLKP(bp);
 
@@ -210,7 +159,7 @@ void* sort(void *bp, int BUF_COUNT){
 
 	}
 
-	return bp;
+	return bp; // Header of Last block in sorted list
 
 }
 
@@ -219,7 +168,7 @@ void* sort(void *bp, int BUF_COUNT){
 
 // bp = first block of ram
 void print_RAM(void* bp,int RAM_SIZE){ 
-	printf("---RAM PRINTING---\n");
+	printf("---PRINTING---\n");
 	//for 1st block
 
 	int	RAM_COUNT2 = 0;
@@ -243,9 +192,9 @@ void print_RAM(void* bp,int RAM_SIZE){
 
 		} else {
 			printf("HEEE\n");
-			if ( RAM_COUNT2+4 < RAM_SIZE+1 ){
-				bp += 4; //4 bytes
-				RAM_COUNT2+=4;
+			if ( RAM_COUNT2+8 < RAM_SIZE+1 ){
+				bp += 8; //4 bytes
+				RAM_COUNT2+=8;
 			}else {
 
 				printf("-- END of Ram333 -- \n");  
@@ -267,8 +216,9 @@ void print_RAM(void* bp,int RAM_SIZE){
 
    int BUF_TMP_MAX = BUF_SIZE;
 // GO to 1st block
-if(BUF_SIZE!=0){
-while(0 < BUF_SIZE - GET_SIZE(PREV_BLKP(tmp_buf))){// Stops at 0
+if(BUF_SIZE!=0):{
+while(0 < BUF_SIw
+ZE - GET_SIZE(PREV_BLKP(tmp_buf))){// Stops at 0
 printf("ggggg2222\n");	
 BUF_SIZE-=GET_SIZE(PREV_BLKP(tmp_buf));
 printf("BUFFF: %d\n",BUF_SIZE);
@@ -333,8 +283,95 @@ void* coalesce(void *bp,int RAM_COUNT){
 }
 
 
+// Creates a LL and returns head
+void* createLL(void *ram){
+	printf("TTT\n");
+	struct block *head = NULL;
+	struct block *cursor = NULL;
+
+	int count=0;
+	struct block *currentBlock = NULL;
+	//	currentBlock->prev=NULL;
+	//	currentBlock->next=NULL;
+
+
+	// NOT empty
+	if(GET_ID(ram)==1 || GET_ID(ram)==2 || GET_ID(ram)==3){
+		currentBlock = malloc(sizeof(struct block));
+		currentBlock->ID = GET_ID(ram);
+		currentBlock->size = GET_SIZE(ram);
+		currentBlock->flag = GET_ALLOC(ram);
+		currentBlock->addr = ram;// addr of ram
+		count+=currentBlock->size;
+
+		head = currentBlock;
+		cursor = currentBlock;
+
+		while(count+ GET_SIZE(NEXT_BLKP(ram)) < MAXSIZE+1){
 
 
 
+			if(GET_ID(NEXT_BLKP(ram))==1 || GET_ID(NEXT_BLKP(ram))==2 || GET_ID(NEXT_BLKP(ram))==3){   
+				struct block *nextBlock = malloc(sizeof(struct block));
+				nextBlock->ID = GET_ID(NEXT_BLKP(ram));
+				nextBlock->size = GET_SIZE(NEXT_BLKP(ram));
+				nextBlock->flag = GET_ALLOC(NEXT_BLKP(ram));
+				nextBlock->addr = NEXT_BLKP(ram); // addr of header
+				(*cursor).next = nextBlock;
+				cursor= cursor->next;	
+				count+=(*cursor).size;
+				ram = NEXT_BLKP(ram);
 
 
+			}
+			else{
+				ram= NEXT_BLKP(ram)+8;
+				count+=8; // count is ahead
+
+
+			}
+		}
+
+
+	} else {
+		// Ram empty?
+		return NULL;
+	}
+
+	(*cursor).next = NULL;// Tail
+	return head;
+
+
+}
+
+
+
+void printLL(struct block* head){
+	struct block* cursor = head;
+
+	while(cursor!=NULL){
+		printf("ID:%d SIZE:%d FLAG:%d ADDR:%p\n", cursor->ID, cursor->size, cursor-> flag, cursor->addr);
+		cursor = cursor->next;
+	}
+
+}
+
+
+
+/*
+
+
+   printf("-----SBRK-----\n");
+   if(cse320_sbrk(size)==NULL){
+//	printf(errno);
+perror("");					
+exit(errno);
+}
+BUF_COUNT+=GET_SIZE(cursor);
+MAX_BUF_SIZE+=size;
+}
+IZE(NEXT_BLKP(ram)
+
+)
+
+ */

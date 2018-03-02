@@ -1,4 +1,49 @@
 §
+
+	while(RAM_COUNT + GET_SIZE(cursor) < MAXSIZE+1){
+		//	printf("sssskkkjjj\n");
+		if(GET_ID(cursor)==1 || GET_ID(cursor)==2 || GET_ID(cursor)==3){
+
+			printf("!!!HH!!!!!\n");
+
+			// Not enough BUF
+			if(BUF_COUNT + GET_SIZE(cursor) >  MAX_BUF_SIZE){
+				if(MAX_BUF_SIZE < MAXSIZE+1){			
+					ssize_t size = BUF_COUNT+GET_SIZE(cursor) - MAX_BUF_SIZE;
+					//	INCR_BUF_SIZE+=size;
+					printf("-----SBRK-----\n");
+					if(cse320_sbrk(size)==NULL){
+						//	printf(errno);
+						perror("");					
+						exit(errno);
+					}
+					BUF_COUNT+=GET_SIZE(cursor);
+					MAX_BUF_SIZE+=size;
+				}
+				printf("Print error\n");
+
+			}			
+			memmove(BUF_cursor, cursor , GET_SIZE(cursor));
+			//	BUF_COUNT+=GET_SIZE(BUF_cursor);
+
+			print_RAM(tmp_buf,BUF_COUNT+GET_SIZE(BUF_cursor));
+			printf("1RAM_COUNT: %d\n",BUF_COUNT);   
+			BUF_cursor = sort(BUF_cursor,BUF_COUNT);		
+			printf("122RAM_COUNT: %d\n",BUF_COUNT);	
+			BUF_COUNT+=GET_SIZE(BUF_cursor);
+			printf("133RAM_COUNT: %d\n",BUF_COUNT);			
+
+			print_RAM(tmp_buf,BUF_COUNT);
+
+
+			RAM_COUNT+=GET_SIZE(ram);
+			cursor = NEXT_BLKP(cursor);
+
+			BUF_cursor = NEXT_BLKP(BUF_cursor);
+
+			printf("kkkjjj\n"); 
+
+	
 		if(prev_alloc && next_alloc){ // 1--1
 			
 RAM_COUNT+=size;
