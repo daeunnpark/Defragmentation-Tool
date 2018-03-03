@@ -11,7 +11,9 @@ int tester(int x){
 }
 
 void PUT(void* p, int val){
-	(*(unsigned int *)(p)= (val)); 
+//i	(*(unsigned int *)(p)= (val)); 
+ (*(int *)(p)= (val));
+//p= val;  
 }
 
 
@@ -21,6 +23,7 @@ void PUT_SIZE(void* p, int size){
 	   PUT(FTRP(p),(GET(FTRP(p))<<61)>>61 | size);
 	 */
 	PUT( p, (GET(p)<<61)>>61 | size);
+//PUT(p, GET(p)| size);  
 }
 
 void PUT_ID(void* p, int ID){
@@ -44,7 +47,9 @@ void PUT_ALLOC(void* p, int flag){
 
 // not int?
 int GET(void* p){
-	return (*(unsigned int *)(p));  
+//	return (*(unsigned int *)(p));  
+return (*(int *)(p));
+//return *(p);
 }
 
 

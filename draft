@@ -1,4 +1,102 @@
 §
+void print_BUF(void* tmp_buf){
+
+	printf("---START BUF PRINTING---\n");	
+	void* tmp = tmp_buf;
+	while(GET_SIZE(tmp)!=0){	
+		//	while(GET_ID(tmp)==1 ||GET_ID(tmp)==2 ||GET_ID(tmp)==3){
+		printf("ID : %d ALLOC : %d SIZE: %d\n", GET_ID(tmp), GET_ALLOC(tmp), GET_SIZE(tmp));
+
+		tmp+=GET_SIZE(tmp);
+	}
+
+	printf("---END BUF PRINTING---\n");
+
+	}
+/*
+	// bp = first block in ram
+	void* coalesce(void *bp,int RAM_COUNT){
+
+
+		int RAM_COUNT2=0;
+		while(RAM_COUNT2 < RAM_COUNT+1){ // stop it =
+
+			int prev_alloc = GET_ALLOC(HDRP(bp)); // current		
+			int next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
+
+
+			size_t size = GET_SIZE(HDRP(bp));
+
+			if((!prev_alloc) && (!next_alloc)){
+				size+=GET_SIZE(HDRP(NEXT_BLKP(bp)));
+				PUT_SIZE(HDRP(bp),size);
+				PUT_SIZE(FTRP(NEXT_BLKP(bp)),size);
+				// NO change in bp
+
+			} else {
+				RAM_COUNT2+=GET_SIZE(bp);
+				bp = NEXT_BLKP(bp);
+			}
+			// RESET RAM ptr
+			/*	while(PREV_BLKP(bp)!= NULL){
+				bp = PREV_BLKP(bp, RAM_SIZE);
+				}
+			 */
+
+		}
+
+		return bp; // Last block
+
+	}
+/*
+void toBUF(void **bp, void *head){
+printf("gggrr\n");
+
+	struct block *cursor = head;
+	while(cursor!=NULL){
+		printf("HOW MANY");
+
+		memcpy(bp,(*cursor).addr, (*cursor).size);
+		*bp = NEXT_BLKP(bp);
+
+		cursor = cursor->next;
+printf("ggg\n");
+	}
+
+   PUT_SIZE(HDRP(*bp),16);
+		   PUT_SIZE(FTRP(*bp),16);
+		   PUT_ID(HDRP(*bp),0);
+		   PUT_ID(FTRP(*bp),0);
+		   PUT_ALLOC(HDRP(*bp),0);
+		   PUT_ALLOC(FTRP(*bp),0);
+
+
+printf("inf   %p\n", *bp);
+}
+*/
+
+
+/*
+void toBUF(void *bp, void *head){
+
+
+	struct block *cursor = head;
+	while(cursor!=NULL){
+		printf("HOW MANY");
+
+		memcpy(bp,(*cursor).addr, (*cursor).size);
+		bp = NEXT_BLKP(bp);
+
+		cursor = cursor->next;
+
+	}
+
+   PUT_SIZE(HDRP(bp),16);
+		   PUT_SIZE(FTRP(bp),16);
+		   PUT_ID(HDRP(bp),0);
+		   PUT_ID(FTRP(bp),0);
+		   PUT_ALLOC(HDRP(bp),0);
+		   PUT_ALLOC(FTRP(bp),0);
 
 	while(RAM_COUNT + GET_SIZE(cursor) < MAXSIZE+1){
 		//	printf("sssskkkjjj\n");
