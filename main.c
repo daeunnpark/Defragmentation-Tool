@@ -41,25 +41,24 @@ int main(int argc, char** argv) {
 	 * of the code.
 	 */
 
-if(ram==NULL){
-printf("INIT_ERROR\n");
-return errno;
-}
-
+	if(ram==NULL){
+		printf("INIT_ERROR\n");
+		return errno;
+	}
 	struct block* LLhead= NULL;
 
 	// Create LinkedList
 	LLhead = createLL(ram);
 
+	/*
+	   if(countSize(LLhead)+16>MAXSIZE){
+	   printf("SBRK_ERROR\n");
+	   errno = "ENOMEM";
+	   return errno;	
+	   }
+	 */
 
-	if(countSize(LLhead)+16>MAXSIZE){
-		printf("SBRK_ERROR\n");
-errno = ENOMEM;
-return errno;	
-}
-
-
-// Sork LL
+	// Sork LL
 	bubbleSort(LLhead);
 
 	// Write LL to tmp_buf	
@@ -70,6 +69,7 @@ return errno;
 
 	//Copy tmp_buf to ram, with last block of size 16
 	memcpy(ram,tmp_buf,countSize(LLhead)+16);
+
 
 
 
@@ -111,15 +111,17 @@ void* createLL(void *ram){
 		i++;
 
 
-
 		while(count+ GET_SIZE(NEXT_BLKP(ram)) < MAXSIZE+1){
 
 			if(GET_ID(NEXT_BLKP(ram))==1 || GET_ID(NEXT_BLKP(ram))==2 || GET_ID(NEXT_BLKP(ram))==3){   
-				struct block nextBlock = blocks[i];				nextBlock.ID = GET_ID(NEXT_BLKP(ram));
-				nextBlock.size = GET_SIZE(NEXT_BLKP(ram));
-				nextBlock.flag = GET_ALLOC(NEXT_BLKP(ram));
-				nextBlock.addr = NEXT_BLKP(ram); // addr of header
-				(*cursor).next = &nextBlock;
+				blocks[i].ID = GET_ID(NEXT_BLKP(ram));
+				blocks[i].size = GET_SIZE(NEXT_BLKP(ram));
+				blocks[i].flag = GET_ALLOC(NEXT_BLKP(ram));
+				blocks[i].addr = NEXT_BLKP(ram); // addr of header
+
+
+				//				printf("ID: %d Size: %d Flag: %d \n", blocks[i].ID,  blocks[i].size, blocks[i].flag );  
+				(*cursor).next =  &blocks[i];
 				cursor= cursor->next;	
 				count+=(*cursor).size;
 				ram = NEXT_BLKP(ram);
@@ -149,17 +151,19 @@ void* createLL(void *ram){
 
 // Sorts by decreasing ID, Allod-non Alloc, increasing size
 void bubbleSort(void *start) {
+
 	int swapped, i;
 	struct block *ptr1;
 	struct block *lptr = NULL;
 
 	/* Checking for empty list */
+	/*
+	   if (ptr1 == NULL){
+	   printf("sse\n");	
+	   return;
+	   }
 
-	if (ptr1 == NULL){
-		return;
-	}
-
-
+	 */
 	do
 	{
 		swapped = 0;
@@ -224,14 +228,14 @@ void toBUF(void *bp, void *head){
 	int sbrkflag=0;
 	int count2=(*cursor).size;
 	void* temp=NULL;
-/*
-	if(countSize(head)+16>MAXSIZE){
-		errno=ENOMEM;
-		printf("SBRK_ERROR\n");
-return ENOMEM;	
-}
+	/*
+	   if(countSize(head)+16>MAXSIZE){
+	   errno=ENOMEM;
+	   printf("SBRK_ERROR\n");
+	   return ENOMEM;	
+	   }
 
-*/
+	 */
 	while(cursor!=NULL){
 
 		count2+=(*cursor).size;
@@ -246,7 +250,6 @@ return ENOMEM;
 					exit(errno);
 
 				}else{
-					//	bp =temp-;
 					//	printf("FIRST"); 
 					//	printf("ID: %d FLAG: %d SIZE:  %d\n", (*cursor).ID,(*cursor).flag, (*cursor).size);
 
@@ -267,8 +270,7 @@ return ENOMEM;
 		bp = NEXT_BLKP(bp);
 
 		cursor = cursor->next;
-	}
-	// ADD LAST BLOCK
+	}	// ADD LAST BLOCK
 	PUT_SIZE(HDRP(bp),16);
 	PUT_SIZE(FTRP(bp),16);
 	PUT_ID(HDRP(bp),0);
@@ -331,7 +333,9 @@ int countSize(void* head){
 void printLL(struct block* head){
 	struct block* cursor = head;
 
-	while(cursor!=NULL){
+	while(cursor!=NULL)
+	{
+		printf("OLZZZ\n");
 		printf("ID:%d FLAG:%d SIZE:%d ADDR:%p\n", cursor->ID, cursor->flag, cursor-> size, cursor->addr);
 		cursor = cursor->next;
 	}
