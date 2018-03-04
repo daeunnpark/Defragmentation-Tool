@@ -1,5 +1,6 @@
 #include "helper.h"
 #include "helper2.h"
+#include "errno.h"
 #define MAXSIZE	1024
 #define MAXSIZE2 128
 
