@@ -42,16 +42,23 @@ int main(int argc, char** argv) {
 
 if(ram==NULL){
 printf("INIT_ERROR\n");
-return ENOMEM;
+return errno;
 }
-
 
 	struct block* LLhead= NULL;
 
 	// Create LinkedList
 	LLhead = createLL(ram);
 
-	// Sork LL
+
+	if(countSize(LLhead)+16>MAXSIZE){
+		printf("SBRK_ERROR\n");
+errno = ENOMEM;
+return errno;	
+}
+
+
+// Sork LL
 	bubbleSort(LLhead);
 
 	// Write LL to tmp_buf	
@@ -216,14 +223,14 @@ void toBUF(void *bp, void *head){
 	int sbrkflag=0;
 	int count2=(*cursor).size;
 	void* temp=NULL;
-
+/*
 	if(countSize(head)+16>MAXSIZE){
 		errno=ENOMEM;
 		printf("SBRK_ERROR\n");
 return ENOMEM;	
 }
 
-
+*/
 	while(cursor!=NULL){
 
 		count2+=(*cursor).size;
