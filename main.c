@@ -40,7 +40,10 @@ int main(int argc, char** argv) {
 	 * of the code.
 	 */
 
-
+if(ram==NULL){
+printf("INIT_ERROR\n");
+return ENOMEM;
+}
 
 
 	struct block* LLhead= NULL;
@@ -217,8 +220,8 @@ void toBUF(void *bp, void *head){
 	if(countSize(head)+16>MAXSIZE){
 		errno=ENOMEM;
 		printf("SBRK_ERROR\n");
-		exit(errno);
-	}
+return ENOMEM;	
+}
 
 
 	while(cursor!=NULL){
