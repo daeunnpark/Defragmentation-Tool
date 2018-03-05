@@ -45,39 +45,41 @@ int main(int argc, char** argv) {
 		printf("INIT_ERROR\n");
 		return errno;
 	}
+
 	struct block* LLhead= NULL;
 
-//	print_BUF(ram);
-
+	//	print_BUF(ram);
 
 	// Create LinkedList
 	LLhead = createLL(ram);
 
-//	printLL(LLhead);
+	//	printLL(LLhead);
 
-	
-	   if(countSize(LLhead)+16>MAXSIZE){
-	   printf("SBRK_ERROR\n");
-	   errno = ENOMEM;
-	   return errno;	
-	   }
-	 
+
+	if(countSize(LLhead)+16>MAXSIZE){
+		printf("SBRK_ERROR\n");
+		errno = ENOMEM;
+		return errno;	
+	}
+
 
 	// Sork LL
 	bubbleSort(LLhead);//	printLL(LLhead);
-	
-// Write LL to tmp_buf	
+
+	// Write LL to tmp_buf	
 	toBUF(tmp_buf, LLhead); 
 
 	// Coalesce tmp_buf
 	coalesce(tmp_buf, LLhead);
-	
-//Copy tmp_buf to ram, with last block of size 16
+
+	//Copy tmp_buf to ram, with last block of size 16
 	memcpy(ram,tmp_buf,countSize(LLhead)+16);
 
 
+	//print_BUF(ram);
 
-// Reset the rest of Ram
+
+	// Reset the rest of Ram
 	for(int i=countSize(LLhead)+16; i<MAXSIZE-countSize(LLhead)-16;i+=8){
 		PUT(ram+i,0);
 	}
@@ -110,7 +112,7 @@ void* createLL(void *ram){
 	struct block blocks[64]; // max num of blocks in ram
 	int nextBlockSize =0;
 
-// Get first non empty
+	// Get first non empty
 	while(GET(ram)==0){
 		ram +=8;
 		count+=8;
@@ -119,7 +121,6 @@ void* createLL(void *ram){
 
 	// FIND first block non empty, that ID !=0
 	if(GET_ID(ram)==1 || GET_ID(ram)==2 || GET_ID(ram)==3){
-		//	printf("FIRST BLOCK\n");		
 		currentBlock = blocks[i];
 		currentBlock.ID = GET_ID(ram);
 		currentBlock.size = GET_SIZE(ram);
@@ -133,13 +134,11 @@ void* createLL(void *ram){
 
 		if(  GET(NEXT_BLKP(ram))!=0){
 			nextBlockSize = GET_SIZE(NEXT_BLKP(ram));
-		}
-		else{
-
+		} else {
 			nextBlockSize=8;
 
 		}
-	}	
+	}
 	while(count+nextBlockSize  < MAXSIZE+1 ){
 		if(nextBlockSize!=8){	// Next is not a gap
 			if(flag!=1){
@@ -160,11 +159,11 @@ void* createLL(void *ram){
 			(*cursor).next =  &blocks[i];
 			cursor= cursor->next;	
 			count+=(*cursor).size;
-			if(flag!=1){
+			
+if(flag!=1){
 				ram = NEXT_BLKP(ram);
 			}else{
 				ram = NEXT_BLKP2(ram);
-
 				flag=0;
 			}
 
@@ -177,21 +176,18 @@ void* createLL(void *ram){
 				nextBlockSize=8;
 			}
 
+
 		} else {
 
-		ram = NEXT_BLKP(ram);
+			ram = NEXT_BLKP(ram);
 			count+=GET_SIZE(ram);
 			if(GET(ram+8)!=0  ){ // = GET(NEXT_BLKP(ram)
-				//			printf("always2\n");	
 				flag=1;
 				nextBlockSize= GET_SIZE(ram+8);
 
-				//				printf("always2\n");
-
-			}else{
+			} else {
 				ram +=8;
 				count+=8;
-				//				printf("always11\n"); 
 				nextBlockSize =8;
 			}
 
@@ -205,7 +201,6 @@ void* createLL(void *ram){
 
 	(*cursor).next = NULL;// Tail
 
-	printf("lastcount!!!!: %d\n", count);
 	return head;
 }
 
@@ -308,19 +303,15 @@ void toBUF(void *bp, void *head){
 				temp = cse320_sbrk(count2-MAXSIZE2);
 				if(temp==NULL){
 					printf("SBRK_ERROR\n");
-					//	printf("----!!!!!____");
-					//	perror(": ");
 					exit(errno);
 
 				}else{
-					//	printf("FIRST"); 
 					//	printf("ID: %d FLAG: %d SIZE:  %d\n", (*cursor).ID,(*cursor).flag, (*cursor).size);
 
 				}
 
 
 			} else { // NOT FIRST TIME
-				//	printf("keeps alloc");			
 
 				//	printf("ID: %d FLAG: %d SIZE:  %d\n", (*cursor).ID,(*cursor).flag, (*cursor).size);
 
@@ -333,7 +324,9 @@ void toBUF(void *bp, void *head){
 		bp = NEXT_BLKP(bp);
 
 		cursor = cursor->next;
-	}	// ADD LAST BLOCK
+	}	
+
+	// ADD LAST BLOCK
 	PUT_SIZE(HDRP(bp),16);
 	PUT_SIZE(FTRP(bp),16);
 	PUT_ID(HDRP(bp),0);
@@ -357,18 +350,12 @@ void* coalesce(void *bp, void *head){
 	while(cursor->next !=NULL){
 		if( (cursor->ID == cursor->next->ID) && cursor->flag ==0 && cursor->next->flag == 0){
 			size=GET_SIZE(HDRP(bp)) + GET_SIZE(HDRP(NEXT_BLKP(bp)));
-			//	printf("coal: %d %d %d\n",GET_SIZE(HDRP(bp)), GET_SIZE(HDRP(NEXT_BLKP(bp))), size);  
-			//	printf("During coal: %d %d %d %d\n",GET_SIZE(HDRP(bp)), GET_SIZE(FTRP(bp)), GET_SIZE(HDRP(NEXT_BLKP(bp))),GET_SIZE(FTRP(NEXT_BLKP(bp))) );
-
 			PUT_SIZE(FTRP(NEXT_BLKP(bp)),size);
 			PUT_SIZE(HDRP(bp),size);
 
-			//	printf("AFTEr coal: %d %d\n", GET_SIZE(HDRP(bp)), GET_SIZE(FTRP(NEXT_BLKP(bp)) ));
 		} else {
 			bp = NEXT_BLKP(bp);
 		}
-
-
 		cursor = cursor->next;
 	}	
 
@@ -378,14 +365,11 @@ void* coalesce(void *bp, void *head){
 
 int countSize(void* head){
 	struct block* cursor = head;
-	int count = 0;//cursor->size;
+	int count = 0;
+
 	while(cursor!=NULL){
-		//printf("count: %d\n ",cursor->size);
-
 		count+=cursor->size;
-
 		cursor = cursor->next;
-
 	}
 	return count;
 
@@ -399,9 +383,7 @@ int countSize(void* head){
 void printLL(struct block* head){
 	struct block* cursor = head;
 
-	while(cursor!=NULL)
-	{
-		//		printf("OLZZZ\n");
+	while(cursor!=NULL)	{
 		printf("ID:%d FLAG:%d SIZE:%d ADDR:%p\n", cursor->ID, cursor->flag, cursor-> size, cursor->addr);
 		cursor = cursor->next;
 	}
@@ -421,16 +403,10 @@ void print_BUF(void* tmp_buf){
 		count+=8;
 	}
 
-	//	printf("COUNT2: %d \n ", count); 
-	//	printf("COUNT3: %d \n ",GET_SIZE(tmp) );  
 	count+=GET_SIZE(tmp); 
-	count+=GET_SIZE(tmp); 
-	//	printf("COUNT4: %d \n ", count);
 	while(GET_SIZE(tmp)!=-1 && count < MAXSIZE){	
-		//	while(GET_ID(tmp)==1 ||GET_ID(tmp)==2 ||GET_ID(tmp)==3)
 
 		if(GET(tmp)==0){
-			//			printf("Printing gAP \n");
 			tmp+=8;
 			count+=8;	
 		} else {
