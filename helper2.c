@@ -13,7 +13,7 @@ void PUT_SIZE(void* p, int size){
 int flag = GET_ALLOC(p);
 int ID = GET_ID(p);
 
-PUT(p,size);
+PUT(p,size);// always ending with 000 since size if multiple of 16
 PUT_ID(p,ID);
 PUT_ALLOC(p,flag);
 
@@ -24,7 +24,13 @@ PUT_ALLOC(p,flag);
 }
 
 void PUT_ID(void* p, int ID){
+int flag = GET_ALLOC(p);
+int size = GET_SIZE(p);
+
+PUT(p,size);// set 3 last bits to 0
 	PUT( p, GET(p) | (ID<<1));
+PUT_ALLOC(p,flag);
+
 }
 
 
@@ -68,5 +74,16 @@ return ((char*)(bp) - GET_SIZE((char *)(bp)-DSIZE));
 void* NEXT_BLKP(void* bp){  
 return ((char*)(bp)+GET_SIZE(bp));
 }
+
+void* NEXT_BLKP2(void* bp){  
+if(GET(bp)==0){
+return ((char*)(bp)+8);
+}
+return ((char*)(bp)+GET_SIZE(bp)); 
+
+}
+
+
+
 
 

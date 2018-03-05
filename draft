@@ -1,4 +1,39 @@
-§
+§/*
+	for(int i=96; i<128;i+=8){
+		//printf("+1\n");
+		//printf("how many\n");
+		PUT(ram+i,0);
+	}
+
+	for(int i=224; i<304;i+=8){
+		//printf("+1\n");
+		//printf("how many\n");
+		PUT(ram+i,0);
+
+	}
+	for(int i=160; i<224;i+=8){
+		//printf("+1\n");
+		//printf("how many\n");
+		PUT(ram+i,0);
+	}
+	for(int i=32; i<96;i+=8){
+		//printf("+1\n");
+		//printf("how many\n");
+		PUT(ram+i,0);
+	}
+
+*/
+
+/*
+PUT(ram+992, 32);
+PUT(ram+1016,32);
+PUT_ID(HDRP(ram+992),3);
+PUT_ID(FTRP(ram+992),3);
+PUT_ALLOC(HDRP(ram+992),1);
+PUT_ALLOC(FTRP(ram+992),1);
+*/
+
+
 void print_BUF(void* tmp_buf){
 
 	printf("---START BUF PRINTING---\n");	

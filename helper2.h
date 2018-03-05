@@ -18,3 +18,6 @@ void* HDRP(void* p);
 void* FTRP(void* p);
 void* PREV_BLKP(void* p);
 void* NEXT_BLKP(void* p);
+void* NEXT_BLKP2(void* p); 
+
+
