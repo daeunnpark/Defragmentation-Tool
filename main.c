@@ -80,11 +80,19 @@ int main(int argc, char** argv) {
 
 
 	// Reset the rest of Ram
-	for(int i=countSize(LLhead)+16; i<MAXSIZE-countSize(LLhead)-16;i+=8){
+	/*	
+		for(int i=countSize(LLhead)+16; i<MAXSIZE-countSize(LLhead)-16;i+=8){
 		PUT(ram+i,0);
+		}
+	 */
+	int i=countSize(LLhead)+16;
+	while(i<MAXSIZE-countSize(LLhead)-16){
+		PUT(ram+i,0); 
+		i+=8;
+
 	}
 
-//	print_BUF(ram);
+	//	print_BUF(ram);
 
 
 	/*
@@ -159,8 +167,8 @@ void* createLL(void *ram){
 			(*cursor).next =  &blocks[i];
 			cursor= cursor->next;	
 			count+=(*cursor).size;
-			
-if(flag!=1){
+
+			if(flag!=1){
 				ram = NEXT_BLKP(ram);
 			}else{
 				ram = NEXT_BLKP2(ram);
