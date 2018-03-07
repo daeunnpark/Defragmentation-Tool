@@ -19,14 +19,16 @@ void* createLL(void *ram);
 void swap(struct block *a, struct block *b);
 void bubbleSort(void *start);
 void* coalesce(void *bp,void *head);
-
+void* coalesce2(void *bp,void *head);
 void toBUF(void *bp, void *head);
 
 void print_BUF(void* tmp_buf);
 void printLL(struct block *head);
+void superfree();
 
 int countSize(void* head);
-
+void* tmp_buf2;
+void* ram2;
 
 int main(int argc, char** argv) {
 	if (*(argv + 1) == NULL) {
@@ -45,7 +47,6 @@ int main(int argc, char** argv) {
 		printf("INIT_ERROR\n");
 		return errno;
 	}
-
 	struct block* LLhead= NULL;
 
 	//	print_BUF(ram);
@@ -62,7 +63,6 @@ int main(int argc, char** argv) {
 		return errno;	
 	}
 
-
 	// Sork LL
 	bubbleSort(LLhead);//	printLL(LLhead);
 
@@ -75,8 +75,9 @@ int main(int argc, char** argv) {
 	//Copy tmp_buf to ram, with last block of size 16
 	memcpy(ram,tmp_buf,countSize(LLhead)+16);
 
-
-	//print_BUF(ram);
+	//Prepare for superfree
+	ram2 = ram;
+	tmp_buf2 = cse320_tmp_buffer_init();
 
 
 	// Reset the rest of Ram
@@ -92,7 +93,7 @@ int main(int argc, char** argv) {
 
 	}
 
-	//	print_BUF(ram);
+	//superfree();
 
 
 	/*
@@ -103,7 +104,14 @@ int main(int argc, char** argv) {
 	return ret;
 }
 
+void superfree(){
 
+	struct block* LLhead2 = createLL(ram2);
+
+	toBUF(tmp_buf2, LLhead2);// write 2nd epilogue of ID =0 ALLOC = 0 SIZE= 16
+	coalesce2(tmp_buf2, LLhead2);
+	memcpy(ram2, tmp_buf2,countSize(LLhead2));
+}
 
 // Creates a LL and returns head
 void* createLL(void *ram){
@@ -348,7 +356,6 @@ void toBUF(void *bp, void *head){
 
 
 
-
 // Merges 2 consecutive unallocated blocks having = ID
 void* coalesce(void *bp, void *head){
 	int size=0;
@@ -361,6 +368,36 @@ void* coalesce(void *bp, void *head){
 			PUT_SIZE(FTRP(NEXT_BLKP(bp)),size);
 			PUT_SIZE(HDRP(bp),size);
 
+		} else {
+			bp = NEXT_BLKP(bp);
+		}
+		cursor = cursor->next;
+	}	
+
+}
+
+
+
+
+
+// Merges 2 consecutive unallocated blocks and set ID = 0
+void* coalesce2(void *bp, void *head){
+	int size=0;
+	struct block* cursor = head;
+	// cursor not null
+
+	while(cursor->next !=NULL){
+		if( cursor->flag ==0 && cursor->next->flag == 0){
+			if(cursor->next->ID == 0 && cursor->next->size==16){
+				// last block (Epilogue)
+				break; 
+
+			}
+			size=GET_SIZE(HDRP(bp)) + GET_SIZE(HDRP(NEXT_BLKP(bp)));
+			PUT_SIZE(FTRP(NEXT_BLKP(bp)),size);
+			PUT_ID(FTRP(NEXT_BLKP(bp)),0);
+			PUT_SIZE(HDRP(bp),size);
+			PUT_ID(HDRP(bp),0);
 		} else {
 			bp = NEXT_BLKP(bp);
 		}
