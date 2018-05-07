@@ -14,15 +14,15 @@ Application named `"defrag_tool"` can be compiled by typing make.
 - `"test_builder"` allows to construct test files.
 
 # Functions  
-`"void* createLL(void *ram)"` creates a linked list and returns its head
-`"void bubbleSort(void *start)"` sorts linked list by decreasing ID, Allod-non Alloc, increasing size 
-`"void swap(struct block *a, struct block *b)"` swaps data of two nodes a and b
-`"void toBUF(void *bp, void *head)"` copies linkedlist to buffer
-`"void* coalesce(void *bp, void *head)"` merges two consecutive unallocated blocks having the same ID
-`"void* coalesce2(void *bp, void *head)"`  merges two consecutive unallocated blocks having the same ID=0
-`"int countSize(void* head)"` size getter function of linkedlist of given head
-`"void printLL(struct block* head)"` is a helper function to print linked list of given head
-`"void print_BUF(void* tmp_buf)"` is a helper function to print buffer of given head
+`"void* createLL(void *ram)"` creates a linked list and returns its head  
+`"void bubbleSort(void *start)"` sorts linked list by decreasing ID, Allod-non Alloc, increasing size   
+`"void swap(struct block *a, struct block *b)"` swaps data of two nodes a and b  
+`"void toBUF(void *bp, void *head)"` copies linkedlist to buffer  
+`"void* coalesce(void *bp, void *head)"` merges two consecutive unallocated blocks having the same ID  
+`"void* coalesce2(void *bp, void *head)"`  merges two consecutive unallocated blocks having the same ID=0  
+`"int countSize(void* head)"` size getter function of linkedlist of given head  
+`"void printLL(struct block* head)"` is a helper function to print linked list of given head  
+`"void print_BUF(void* tmp_buf)"` is a helper function to print buffer of given head  
 
 
 # Specifications
