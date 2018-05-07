@@ -1,7 +1,8 @@
-Application named `"defrag_tool"` can be compiled by typing make.
+
 
 ## Introduction
 This application implements defragmentation of emulated memory, using buffer and linkedlist.
+Application named `"defrag_tool"` can be compiled by typing make.
 
 #Frameworks
 - Application starts by calling the function "`cse320_init(char* filename)"`, in the framework provided, which loads test file into the emulated memory and returns a pointer to the start of it. Then, `"cse320_tmp_buffer_init()"` will return a pointer to a temporary buffer that is used as a temporary storage. Size of the emulated memory is 1024 Bytes and maximum size of the temporary buffer is also 1024 bytes. 
