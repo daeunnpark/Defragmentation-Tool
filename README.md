@@ -14,19 +14,36 @@ Application named `"defrag_tool"` can be compiled by typing make.
 - `"test_builder"` allows to construct test files.
 
 # Functions  
-`"void* createLL(void *ram)"` creates a linked list and returns its head  
-`"void bubbleSort(void *start)"` sorts linked list by decreasing ID, Allod-non Alloc, increasing size   
-`"void swap(struct block *a, struct block *b)"` swaps data of two nodes a and b  
-`"void toBUF(void *bp, void *head)"` copies linkedlist to buffer  
-`"void* coalesce(void *bp, void *head)"` merges two consecutive unallocated blocks having the same ID  
-`"void* coalesce2(void *bp, void *head)"`  merges two consecutive unallocated blocks having the same ID=0  
-`"int countSize(void* head)"` size getter function of linkedlist of given head  
-`"void printLL(struct block* head)"` is a helper function to print linked list of given head  
-`"void print_BUF(void* tmp_buf)"` is a helper function to print buffer of given head  
+`"void* createLL(void *ram)"`  
+Creates a linked list and returns its head  
+
+`"void bubbleSort(void *start)"`  
+Sorts linked list by decreasing ID, Allod-non Alloc, increasing size   
+
+`"void swap(struct block *a, struct block *b)"`  
+Swaps data of two nodes a and b  
+
+`"void toBUF(void *bp, void *head)"`  
+Copies linkedlist to buffer  
+
+`"void* coalesce(void *bp, void *head)"`  
+Merges two consecutive unallocated blocks having the same ID  
+
+`"void* coalesce2(void *bp, void *head)"`  
+Merges two consecutive unallocated blocks having the same ID=0  
+
+`"int countSize(void* head)"` 
+Size getter function of linkedlist of given head  
+
+`"void printLL(struct block* head)"`  
+Helper function to print linked list of given head  
+
+`"void print_BUF(void* tmp_buf)"`  
+Helper function to print buffer of given head  
 
 
 # Specifications
-Each memory block consists of header, footer, payload, and possibly padding. Size of the header and footer is one word (8 Bytes). Each block should be double word aligned. You can find structure of header/footer below:  
+- Each memory block consists of header, footer, payload, and possibly padding. Size of the header and footer is one word (8 Bytes). Each block should be double word aligned. You can find structure of header/footer below:  
 
 • Lowest bit represents allocation flag that is 0 when block is free and 1 when block is allocated
 • Next two lowest bits represent application ID to distinguish between dif- ferent applications (more details further)
