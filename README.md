@@ -9,7 +9,7 @@ Application named `"defrag_tool"` can be compiled by typing make.
 
 - However, initially the temporary buffer is limited to 128 Bytes. The size of the temporary buffer can be increased by calling `"cse320 sbrk(ssize_t size)"` that will increase its size by moving the break point. If the function is called with size equals zero, then it returns current break point.
 
-- `"cse320_check(char* filename)"` the emulated memory and `"cse320 free()"` frees temporary buffer and emulated memory.
+- `"cse320_check(char* filename)"` checks the emulated memory and `"cse320 free()"` frees temporary buffer and emulated memory.
 
 - `"test_builder"` allows to construct test files.
 
