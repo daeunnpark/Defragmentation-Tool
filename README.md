@@ -46,8 +46,7 @@ Helper function to print buffer of given head
 Each memory block consists of header, footer, payload, and possibly padding. Size of the header and footer is one word (8 Bytes). Each block should be double word aligned. You can find structure of header/footer below:  
 
 - Lowest bit represents allocation flag that is 0 when block is free and 1 when block is allocated
-- Next two lowest bits represent application ID to distinguish between dif- ferent applications (more details further)
-- Rest of the bits represent size of the block in a similar way as was discussed in lecture (recall, that 8 Bytes always have three lowest bits equal to zero)
+- Next two lowest bits represent application ID to distinguish between different applications (more details further)
 
 
 
